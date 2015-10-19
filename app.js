@@ -32,16 +32,26 @@ app.use('/peerjs', peerServer);
 io.on('connection', function(s) {
 	socket = s;	// Make s object available outside of this function
 
-	console.log('a user connected through websockets with id: %s', socket.id);
+	console.log('websocket connection made with id: %s', socket.id);
 
 	// Player disconnect handler
 	socket.on('disconnect', function(u) {
 		console.log('a user disconnected through websockets with id: %s', socket.id);
+		
+		removePlayerBySocketId(socket.id);
+
 		// console.log(u);
 	});
 
 	socket.on('manual disconnect', function() {
 		socket.disconnect();
+	});
+
+	socket.on('new player', function(player) {
+		console.log('new player :');
+		console.log(player);
+
+		players.push(player);
 	});
 });
 
@@ -49,16 +59,6 @@ io.on('connection', function(s) {
 
 peerServer.on('connection', function(id) {
 	console.log('peerserver connection made with id: %s', id);
-
-	var player = {
-		id: playerId,
-		socketId: 0,
-		connId: id
-	};
-	players.push(player);
-	playerId++;
-
-	socket.broadcast.emit('new player', player);
 });
 
 peerServer.on('disconnect', function(id) {
@@ -70,3 +70,26 @@ peerServer.on('disconnect', function(id) {
 app.get('/admin', function(req,res){
 	res.sendFile(__dirname + '/public/admin.html');
 }); 
+
+app.get('/admin/players', function(req, res) {
+	res.json(players);
+});
+
+// Player Functions
+
+function removePlayerBySocketId(id) {
+	var playerIndex = null;
+	for(i = 0; i < players.length; i++) {
+		if (id == players[i].socketId) {
+			playerIndex = i;
+		}
+	}
+
+	if (playerIndex != null) {
+		players.splice(playerIndex, 1);
+		console.log('Player removed from players array with id: %s', id);
+	}
+	else {
+		console.log('No player in players array with socket id: %s', id);
+	}
+}

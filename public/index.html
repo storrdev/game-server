@@ -22,7 +22,7 @@
 			</ul>
 		</div>
 		<div>
-			WebRTC: <span id="webrtc-status" class="status disconnected">Disconnected</span>
+			PeerServer: <span id="peerjs-status" class="status disconnected">Disconnected</span>
 		</div>
 
 		<script>
@@ -65,16 +65,16 @@
 				}
 			}
 
-			function webRtcConnected(connected) {
+			function peerServerConnected(connected) {
 				if (connected === true) {
-					DOM.webrtcStatus.classList.remove('disconnected');
-					DOM.webrtcStatus.innerHTML = 'Connected';
-					DOM.webrtcStatus.classList.add('connected');
+					DOM.peerjsStatus.classList.remove('disconnected');
+					DOM.peerjsStatus.innerHTML = 'Connected';
+					DOM.peerjsStatus.classList.add('connected');
 				}
 				else {
-					DOM.webrtcStatus.classList.remove('connected');
-					DOM.webrtcStatus.innerHTML = 'Disconnected';
-					DOM.webrtcStatus.classList.add('disconnected');
+					DOM.peerjsStatus.classList.remove('connected');
+					DOM.peerjsStatus.innerHTML = 'Disconnected';
+					DOM.peerjsStatus.classList.add('disconnected');
 				}
 			}
 
@@ -83,20 +83,31 @@
 				// Initialize DOM elements
 				DOM.socketStatus = document.getElementById('socket-status');
 				DOM.socketId = document.getElementById('socket-id');
-				DOM.webrtcStatus = document.getElementById('webrtc-status');
+				DOM.peerjsStatus = document.getElementById('peerjs-status');
 
 				socket = io();
 
+				// Websocket connection made with server
 				socket.on('connect', function() {
+					console.clear();
 					console.log('connected to server via websockets with id: %s', socket.io.engine.id);
 					socketConnected(true);
 
-					// Connect to peerServer
+					// Connect to PeerServer
 					peer = new Peer({ host: 'localhost', port: 3000, path: '/peerjs' });
 				
+					// PeerServer connection made with server
 					peer.on('open', function(id) {
-						webRtcConnected(true);
-						console.log(peer);
+						console.log('Connected with PeerServer successfully.');
+						peerServerConnected(true);
+
+						var player = {
+							socketId: socket.io.engine.id,
+							peerId: id
+						};
+
+						console.log('Sending player info to server.');
+						socket.emit('new player', player);
 					});
 				});
 

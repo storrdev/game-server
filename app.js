@@ -24,7 +24,8 @@ var server = http.listen(port, function() {
 
 // Create a PeerJS Server
 // Request webrtc dataconnection from the /peerjs route.
-var peerServer = ExpressPeerServer(server, { debug: true });
+var options = { debug: true };
+var peerServer = ExpressPeerServer(server, options);
 app.use('/peerjs', peerServer);
 
 // Socket.io events
@@ -40,7 +41,7 @@ io.on('connection', function(s) {
 		
 		removePlayerBySocketId(socket.id);
 
-		// console.log(u);
+		io.emit('remove player', socket.id);
 	});
 
 	socket.on('manual disconnect', function() {
@@ -52,6 +53,11 @@ io.on('connection', function(s) {
 		console.log(player);
 
 		players.push(player);
+
+		socket.emit('all players', players);
+
+		// Send new player's info to all already connect players.
+		socket.broadcast.emit('new player', player);
 	});
 });
 

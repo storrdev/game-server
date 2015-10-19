@@ -1,0 +1,139 @@
+<html>
+	<head>
+		<title>WebRTC Game Server</title>
+		<link rel="stylesheet" href="css/test_page.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+
+		<h1>WebRTC Game Server</h1>
+
+		<div>
+			<button id="disconnect">Disconnect</button>
+		</div>
+
+		<hr>
+
+		<div>
+			Websockets: <span id="socket-status" class="status disconnected">Disconnected</span>
+			<ul>
+				<li>ID: <span id="socket-id"></span></li>
+			</ul>
+		</div>
+		<div>
+			WebRTC: <span id="webrtc-status" class="status disconnected">Disconnected</span>
+		</div>
+
+		<script>
+
+			/*
+			
+			PLAN:
+
+				The client needs two different id's before it can report to the
+				server as a player
+
+				1. Socket id
+				2. PeerServer id
+
+				wait until both of those are made, then send socket event as
+				'new player' with the whole player info.
+
+			*/
+
+			// var socketConnected = false;
+			// var peerServerConnected = false;
+
+			var socket, peer;
+
+			var DOM = {};
+
+			function socketConnected(connected) {
+				if (connected === true) {
+					DOM.socketStatus.classList.remove('disconnected');
+					DOM.socketStatus.innerHTML = 'Connected';
+					DOM.socketStatus.classList.add('connected');
+					DOM.socketId.innerHTML = socket.io.engine.id;
+				}
+				else {
+					socket.io.disconnect();
+
+					DOM.socketStatus.classList.remove('connected');
+					DOM.socketStatus.innerHTML = 'Disconnected';
+					DOM.socketStatus.classList.add('disconnected');
+				}
+			}
+
+			function webRtcConnected(connected) {
+				if (connected === true) {
+					DOM.webrtcStatus.classList.remove('disconnected');
+					DOM.webrtcStatus.innerHTML = 'Connected';
+					DOM.webrtcStatus.classList.add('connected');
+				}
+				else {
+					DOM.webrtcStatus.classList.remove('connected');
+					DOM.webrtcStatus.innerHTML = 'Disconnected';
+					DOM.webrtcStatus.classList.add('disconnected');
+				}
+			}
+
+			window.onload = function() {
+
+				// Initialize DOM elements
+				DOM.socketStatus = document.getElementById('socket-status');
+				DOM.socketId = document.getElementById('socket-id');
+				DOM.webrtcStatus = document.getElementById('webrtc-status');
+
+				socket = io();
+
+				socket.on('connect', function() {
+					console.log('connected to server via websockets with id: %s', socket.io.engine.id);
+					socketConnected(true);
+
+					// Connect to peerServer
+					peer = new Peer({ host: 'localhost', port: 3000, path: '/peerjs' });
+				
+					peer.on('open', function(id) {
+						webRtcConnected(true);
+						console.log(peer);
+					});
+				});
+
+				// // socket.io events
+				// socket.on('new player', function(player) {
+				// 	console.log('new player');
+					
+				// 	// Make WebRTC dataConnection with new player
+				// 	var conn = peer.connect(player.connId);
+				// 	conn.on('open', function() {
+				// 		conn.send({
+				// 			text: 'connection made with player'
+				// 		});
+				// 	});
+
+				// });
+
+				// PeerJS events
+
+				// peer.on('connection', function(conn) {
+				// 	conn.on('data', function(data) {
+				// 		console.log('data recieved');
+				// 		console.log(data);
+				// 	});
+				// });
+
+				// Handle client manual disconnect
+				document.getElementById('disconnect').addEventListener('click', function() {
+					console.log('disconnecting manually');
+					socketConnected(false);
+				});
+			};
+		</script>
+	</body>
+</html>
+
+
+<script>
+  
+</script>

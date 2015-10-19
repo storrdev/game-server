@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<title>WebRTC Game Server - Admin</title>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<h1>Admin</h1>
+		<h2>Connected Players</h2>
+
+		<table id="players">
+			<thead>
+				<tr>
+					<th>Socket ID</th>
+					<th>WebRTC ID</th>
+					<th>Name</th>
+					<th>IP</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+
+		<script>
+
+			var DOM = {};
+
+			window.onload = function() {
+
+				// Init DOM elements
+				DOM.players = document.getElementById('players').getElementsByTagName('tbody')[0];
+
+				var socket = io();
+
+				// socket.io events
+				socket.on('new player', function(player) {
+					console.log(player);
+
+					var row = DOM.players.insertRow(0);
+					row.id = player.socketId;
+					var socketId = row.insertCell(0);
+					var webRtcId = row.insertCell(1);
+					var name = row.insertCell(2);
+					var ip = row.insertCell(3);
+
+					socketId.innerHTML = player.socketId;
+					webRtcId.innerHTML = player.webRtcId;
+					name.innerHTML = player.name;
+					ip.innerHTML = player.ip;
+
+					// var playerRow = document.createElement('tr');
+					// var gameId = document.createElement('td').innerHTML = '1';
+					// var socketId = document.createElement('td').innerHTML = '1';
+					// var webRtcId = document.createElement('td').innerHTML = '1';
+					// var name = document.createElement('td').innerHTML = '1';
+					// var ip = document.createElement('td').innerHTML = '1';
+
+					// DOM.players.appendChild(playerRow);
+					// playerRow.appendChild(gameId);
+					// playerRow.appendChild(socketId);
+					// playerRow.appendChild(webRtcId);
+					// playerRow.appendChild(name);
+					// playerRow.appendChild(ip);
+
+
+					
+					// // Make WebRTC dataConnection with new player
+					// var conn = peer.connect(player.connId);
+					// conn.on('open', function() {
+					// 	conn.send('hi');
+					// });
+
+				});
+			};
+		</script>
+	</body>
+</html>

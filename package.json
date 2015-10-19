@@ -1,0 +1,17 @@
+{
+  "name": "game-server",
+  "version": "0.0.1",
+  "description": "Low latency Node based multiplayer game server",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.13.3",
+    "peer": "^0.2.8",
+    "socket.io": "^1.3.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stephen Orr",
+  "license": "ISC"
+}

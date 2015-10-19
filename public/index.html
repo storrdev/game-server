@@ -1,47 +1,49 @@
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>WebRTC Game Server</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<link rel="stylesheet" href="css/test_page.css">
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 	</head>
 	<body>
+		<div class="container">
+			<div>
+				<h1>WebRTC Game Server</h1>
+				<button id="disconnect">Disconnect</button>
+			</div>
 
-		<h1>WebRTC Game Server</h1>
+			<hr>
 
-		<div>
-			<button id="disconnect">Disconnect</button>
-		</div>
+			<div>
+				Websockets: <span id="socket-status" class="status disconnected">Disconnected</span>
+				<dl>
+					<dd>ID: <span id="socket-id"></span></dd>
+				</dl>
+			</div>
+			<div>
+				PeerServer: <span id="peerjs-status" class="status disconnected">Disconnected</span>
+				<dl>
+					<dd>ID: <span id="peerjs-id"></span></dd>
+				</dl>
+			</div>
 
-		<hr>
-
-		<div>
-			Websockets: <span id="socket-status" class="status disconnected">Disconnected</span>
-			<dl>
-				<dd>ID: <span id="socket-id"></span></dd>
-			</dl>
-		</div>
-		<div>
-			PeerServer: <span id="peerjs-status" class="status disconnected">Disconnected</span>
-			<dl>
-				<dd>ID: <span id="peerjs-id"></span></dd>
-			</dl>
-		</div>
-
-		<div>
-			<h2>Players</h2>
-			<table id="players">
-				<thead>
-					<tr>
-						<th>Socket ID</th>
-						<th>Peer ID</th>
-						<th>Connected</th>
-					</tr>
-				</thead>
-				<tbody>
-					
-				</tbody>
-			</table>
+			<div>
+				<h2>Players</h2>
+				<table id="players">
+					<thead>
+						<tr>
+							<th>Socket ID</th>
+							<th>Peer ID</th>
+							<th>Connected</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 		<script>
@@ -179,7 +181,6 @@
 					// Make WebRTC dataConnection with new player
 					var conn = peer.connect(player.peerId);
 					conn.on('open', function() {
-						console.log('Connected via WebRTC to player with id: %s', player.peerId);
 						conn.send({
 							text: 'connection made with player'
 						});
@@ -211,6 +212,8 @@
 				}
 			};
 		</script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	</body>
 </html>
 

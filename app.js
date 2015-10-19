@@ -30,8 +30,8 @@ app.use('/peerjs', peerServer);
 
 // Socket.io events
 
-io.on('connection', function(s) {
-	socket = s;	// Make s object available outside of this function
+io.on('connection', function(socket) {
+	// socket = s;	// Make s object available outside of this function
 
 	console.log('websocket connection made with id: %s', socket.id);
 
@@ -39,6 +39,8 @@ io.on('connection', function(s) {
 	socket.on('disconnect', function(u) {
 		console.log('a user disconnected through websockets with id: %s', socket.id);
 		
+		console.log(u);
+
 		removePlayerBySocketId(socket.id);
 
 		io.emit('remove player', socket.id);

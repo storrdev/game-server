@@ -31,12 +31,12 @@
 
 			<div>
 				<h2>Players</h2>
-				<table id="players">
+				<table id="players" class="table">
 					<thead>
 						<tr>
 							<th>Socket ID</th>
 							<th>Peer ID</th>
-							<th>Connected</th>
+							<th>P2P Connect</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -122,6 +122,11 @@
 
 					peer.on('connection', function(conn) {
 						console.log('Connected Via WebRTC to player with id: %s', conn.peer);
+
+						var peerConnect = document.getElementById(conn.peer);
+						peerConnect.innerHTML = 'true';
+
+						// Peer events
 						conn.on('data', function(data) {
 							console.log('data recieved');
 							console.log(data);
@@ -173,6 +178,7 @@
 					var socketId = row.insertCell(0);
 					var peerId = row.insertCell(1);
 					var connected = row.insertCell(2);
+					connected.id = player.peerId;
 
 					socketId.innerHTML = player.socketId;
 					peerId.innerHTML = player.peerId;

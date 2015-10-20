@@ -5,8 +5,6 @@ var io = require('socket.io')(http);
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 
 // Server Setup
-
-var socket;	// Make socket object available outside of the io.on('connection') event function
 var playerId = 1; 
 var players = [];
 
@@ -23,13 +21,12 @@ var server = http.listen(port, function() {
 });
 
 // Create a PeerJS Server
-// Request webrtc dataconnection from the /peerjs route.
+// Route requests to /peerjs to the PeerJS Server.
 var options = { debug: true };
 var peerServer = ExpressPeerServer(server, options);
 app.use('/peerjs', peerServer);
 
 // Socket.io events
-
 io.on('connection', function(socket) {
 	// socket = s;	// Make s object available outside of this function
 
@@ -101,3 +98,6 @@ function removePlayerBySocketId(id) {
 		console.log('No player in players array with socket id: %s', id);
 	}
 }
+
+// Exports
+exports.app = app;

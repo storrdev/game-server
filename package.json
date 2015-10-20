@@ -1,8 +1,12 @@
 {
   "name": "game-server",
-  "version": "0.0.1",
-  "description": "Low latency Node based multiplayer game server",
+  "version": "0.0.2",
+  "description": "P2P game server for HTML5 based multiplayer games.",
   "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/storrdev/game-server.git"
+  },
   "dependencies": {
     "express": "^4.13.3",
     "peer": "^0.2.8",
@@ -13,5 +17,5 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Stephen Orr",
-  "license": "ISC"
+  "license": "MIT"
 }

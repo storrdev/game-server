@@ -3,9 +3,10 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ExpressPeerServer = require('peer').ExpressPeerServer;
+var fs = require('fs');
 
 // Server Setup
-var playerId = 1; 
+var playerId = 1;
 var players = [];
 
 // Setup Static File Directory
@@ -72,12 +73,38 @@ peerServer.on('disconnect', function(id) {
 
 // Routes
 
+app.get('/debug', function(req, res) {
+	res.sendFile(__dirname + '/public/debug.html');
+});
+
 app.get('/admin', function(req,res){
 	res.sendFile(__dirname + '/public/admin.html');
 }); 
 
 app.get('/admin/players', function(req, res) {
 	res.json(players);
+});
+
+app.get('/game-server.js', function(req, res) {
+
+	/*
+	*	Read and combine any 3rd party client side scripts so we can serve
+	* 	just one js file: game-server.js
+	*/
+
+	fs.readFile(__dirname + '/node_modules/peerjs/dist/peer.min.js', 'utf-8', function(err, peerFile) {
+		if (err) throw err;
+
+		fs.readFile(__dirname + '/lib/js/game-server.js', 'utf-8', function(err, gameFile) {
+			if (err) throw err;
+
+			res.set('Content-Type', 'application/javascript');
+
+			var clientJs = peerFile + '\n\n' + gameFile;
+
+			res.send(clientJs);
+		});
+	});
 });
 
 // Player Functions

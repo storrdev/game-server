@@ -92,17 +92,19 @@ app.get('/game-server.js', function(req, res) {
 	* 	just one js file: game-server.js
 	*/
 
-	fs.readFile(__dirname + '/node_modules/peerjs/dist/peer.min.js', 'utf-8', function(err, peerFile) {
+	fs.readFile(__dirname + '/node_modules/socket.io/node_modules/socket.io-client/socket.io.js', 'utf-8', function(err, socket) {
 		if (err) throw err;
-
-		fs.readFile(__dirname + '/lib/js/game-server.js', 'utf-8', function(err, gameFile) {
+		fs.readFile(__dirname + '/node_modules/peerjs/dist/peer.min.js', 'utf-8', function(err, peerFile) {
 			if (err) throw err;
+			fs.readFile(__dirname + '/lib/js/game-server.js', 'utf-8', function(err, gameFile) {
+				if (err) throw err;
 
-			res.set('Content-Type', 'application/javascript');
+				res.set('Content-Type', 'application/javascript');
 
-			var clientJs = peerFile + '\n\n' + gameFile;
+				var clientJs = socket + '\n\n' + peerFile + '\n\n' + gameFile;
 
-			res.send(clientJs);
+				res.send(clientJs);
+			});
 		});
 	});
 });

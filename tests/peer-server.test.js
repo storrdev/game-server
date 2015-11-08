@@ -16,13 +16,11 @@ describe('Peer Server', function() {
 		myApp.stop(done);
 	});
 
-	describe('when requested at peerjs', function() {
-		it('it should return an object describing itself', function(done) {
+	describe('when requested at /peerjs', function() {
+		it('should return an object describing itself', function(done) {
 			request.get(baseUrl + '/peerjs').end(function assert(err, res) {
 				expect(err).to.not.be.ok;
 				expect(res).to.have.property('status', 200);
-
-				// console.log(res.text);
 				expect(JSON.parse(res.text)).to.have.property('name', 'PeerJS Server');
 				done();
 			});

@@ -10,13 +10,20 @@ var server, peerServer;
 var playerId = 1;
 var players = [];
 
+// Logger Setup
+var logger = function(msg) {
+	if (process.env.NODE_ENV != 'test') {
+		console.log(msg);
+	}
+}
+
 var start = exports.start = function start(port, callback) {
 	if (process.env.PORT) {
 		port = process.env.PORT;
 	}
 	else {
 		if (typeof port == 'function' || typeof port == 'undefined') {
-			console.log('No port defined for app, defaulting to 3000');
+			logger('No port defined for app, defaulting to 3000');
 			port = 3000;
 		}
 	}
@@ -25,7 +32,7 @@ var start = exports.start = function start(port, callback) {
 		var host = server.address().address;
 		var port = server.address().port;
 
-		console.log('Example app listening at http://%s:%s', host, port);
+		logger('Example app listening at http://' + host + ':' + port);
 
 		// Create a PeerJS Server
 		// Route requests to /peerjs to the PeerJS Server.
@@ -35,14 +42,16 @@ var start = exports.start = function start(port, callback) {
 
 		// Peer events
 		peerServer.on('connection', function(id) {
-			console.log('peerserver connection made with id: %s', id);
+			logger('peerserver connection made with id: ' + id);
 		});
 
 		peerServer.on('disconnect', function(id) {
-			console.log('peer disconnected with id: %s', id);
+			logger('peer disconnected with id: ' + id);
 		});
 
-		callback();
+		if (typeof callback == 'function') {
+			callback();
+		}
 	});
 };
 
@@ -60,13 +69,13 @@ app.use(express.static('public'));
 io.on('connection', function(socket) {
 	// socket = s;	// Make s object available outside of this function
 
-	console.log('websocket connection made with id: %s', socket.id);
+	logger('websocket connection made with id: ' + socket.id);
 
 	// Player disconnect handler
 	socket.on('disconnect', function(u) {
-		console.log('a user disconnected through websockets with id: %s', socket.id);
+		logger('a user disconnected through websockets with id: ' + socket.id);
 		
-		console.log(u);
+		logger(u);
 
 		removePlayerBySocketId(socket.id);
 
@@ -78,8 +87,8 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('new player', function(player) {
-		console.log('new player :');
-		console.log(player);
+		logger('new player :');
+		logger(player);
 
 		players.push(player);
 
@@ -140,10 +149,10 @@ function removePlayerBySocketId(id) {
 
 	if (playerIndex != null) {
 		players.splice(playerIndex, 1);
-		console.log('Player removed from players array with id: %s', id);
+		logger('Player removed from players array with id: ' + id);
 	}
 	else {
-		console.log('No player in players array with socket id: %s', id);
+		logger('No player in players array with socket id: ' + id);
 	}
 }
 

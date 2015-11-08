@@ -1,9 +1,9 @@
-// tests/test.js
+// tests/peer-server.test.js
 
 var expect = require('chai').expect;
 var request = require('superagent');
 
-describe('Game Server App', function() {
+describe('Peer Server', function() {
 	var myApp = require('../app.js');
 	var port = 3000;
 	var baseUrl = 'http://localhost:' + port;
@@ -21,7 +21,9 @@ describe('Game Server App', function() {
 			request.get(baseUrl + '/peerjs').end(function assert(err, res) {
 				expect(err).to.not.be.ok;
 				expect(res).to.have.property('status', 200);
-				expect(res.text).to.equal('Hello World!');
+
+				// console.log(res.text);
+				expect(JSON.parse(res.text)).to.have.property('name', 'PeerJS Server');
 				done();
 			});
 		});

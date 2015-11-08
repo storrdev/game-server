@@ -6,26 +6,55 @@ var ExpressPeerServer = require('peer').ExpressPeerServer;
 var fs = require('fs');
 
 // Server Setup
+var server, peerServer;
 var playerId = 1;
 var players = [];
+
+var start = exports.start = function start(port, callback) {
+	if (process.env.PORT) {
+		port = process.env.PORT;
+	}
+	else {
+		if (typeof port == 'function' || typeof port == 'undefined') {
+			console.log('No port defined for app, defaulting to 3000');
+			port = 3000;
+		}
+	}
+	
+	server = http.listen(port, function() {
+		var host = server.address().address;
+		var port = server.address().port;
+
+		console.log('Example app listening at http://%s:%s', host, port);
+
+		// Create a PeerJS Server
+		// Route requests to /peerjs to the PeerJS Server.
+		var options = { debug: true };
+		peerServer = ExpressPeerServer(server, options);
+		app.use('/peerjs', peerServer);
+
+		// Peer events
+		peerServer.on('connection', function(id) {
+			console.log('peerserver connection made with id: %s', id);
+		});
+
+		peerServer.on('disconnect', function(id) {
+			console.log('peer disconnected with id: %s', id);
+		});
+
+		callback();
+	});
+};
+
+var stop = exports.stop = function stop(callback) {
+	server.close(callback);
+};
 
 // Setup Static File Directory
 app.use(express.static('public'));
 
-// Start server on heroku specified port or 3000 if on localhost
-var port = process.env.PORT || 3000; // Heroku Only
-var server = http.listen(port, function() {
-	var host = server.address().address;
-	var port = server.address().port;
-
-	console.log('Example app listening at http://%s:%s', host, port);
-});
-
-// Create a PeerJS Server
-// Route requests to /peerjs to the PeerJS Server.
-var options = { debug: true };
-var peerServer = ExpressPeerServer(server, options);
-app.use('/peerjs', peerServer);
+// // Start server on heroku specified port or 3000 if on localhost
+// var port = process.env.PORT || 3000; // Heroku Only
 
 // Socket.io events
 io.on('connection', function(socket) {
@@ -59,16 +88,6 @@ io.on('connection', function(socket) {
 		// Send new player's info to all already connect players.
 		socket.broadcast.emit('new player', player);
 	});
-});
-
-// Peer events
-
-peerServer.on('connection', function(id) {
-	console.log('peerserver connection made with id: %s', id);
-});
-
-peerServer.on('disconnect', function(id) {
-	console.log('peer disconnected with id: %s', id);
 });
 
 // Routes

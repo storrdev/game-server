@@ -115,27 +115,14 @@ app.get('/admin/players', function(req, res) {
 
 app.get('/game-server.js', function(req, res) {
 
-	/*
-	*	Read and combine any 3rd party client side scripts so we can serve
-	* 	just one js file: game-server.js
-	*/
-
-	fs.readFile(__dirname + '/node_modules/socket.io/node_modules/socket.io-client/socket.io.js', 'utf-8', function(err, socket) {
-		if (err) throw err;
-		fs.readFile(__dirname + '/node_modules/peerjs/dist/peer.min.js', 'utf-8', function(err, peerFile) {
-			if (err) throw err;
-			fs.readFile(__dirname + '/lib/js/game-server.js', 'utf-8', function(err, gameFile) {
-				if (err) throw err;
-
-				res.set('Content-Type', 'application/javascript');
-
-				var clientJs = socket + '\n\n' + peerFile + '\n\n' + gameFile;
-
-				res.send(clientJs);
-			});
-		});
-	});
+	// Serves GS library
+	res.sendFile(__dirname + '/lib/js/game-server.js');
 });
+
+app.get('/peer-server.js', function(req, res) {
+	// Servers Peerjs library
+	res.sendFile(__dirname + '/node_modules/peerjs/dist/peer.js');
+})
 
 // Player Functions
 

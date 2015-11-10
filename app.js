@@ -122,7 +122,12 @@ app.get('/game-server.js', function(req, res) {
 app.get('/peer-server.js', function(req, res) {
 	// Servers Peerjs library
 	res.sendFile(__dirname + '/node_modules/peerjs/dist/peer.js');
-})
+});
+
+app.get('/eventemitter.js', function(req, res) {
+	// Servers EventEmitter library
+	res.sendFile(__dirname + '/lib/js/eventemitter/EventEmitter.js');
+});
 
 // Player Functions
 

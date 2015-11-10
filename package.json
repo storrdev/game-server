@@ -1,6 +1,6 @@
 {
   "name": "game-server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "P2P game server for HTML5 based multiplayer games.",
   "main": "app.js",
   "repository": {

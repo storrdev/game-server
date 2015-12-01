@@ -15,17 +15,15 @@ var logger = function(msg) {
 	if (process.env.NODE_ENV != 'test') {
 		console.log(msg);
 	}
-}
+};
 
 var start = exports.start = function start(port, callback) {
-	if (process.env.PORT) {
-		port = process.env.PORT;
+	if (typeof port == 'function') {
+		callback = port;
+		port = process.env.PORT || 3000;
 	}
-	else {
-		if (typeof port == 'function' || typeof port == 'undefined') {
-			logger('No port defined for app, defaulting to 3000');
-			port = 3000;
-		}
+	else if (typeof port == 'undefined')  {
+		port = process.env.PORT || 3000;
 	}
 	
 	server = http.listen(port, function() {
@@ -49,9 +47,43 @@ var start = exports.start = function start(port, callback) {
 			logger('peer disconnected with id: ' + id);
 		});
 
-		if (typeof callback == 'function') {
-			callback();
-		}
+		// Socket.io events
+		io.on('connection', function(socket) {
+			// socket = s;	// Make s object available outside of this function
+
+			logger('websocket connection made with id: ' + socket.id);
+
+			// Player disconnect handler
+			socket.on('disconnect', function(u) {
+				logger('a user disconnected through websockets with id: ' + socket.id);
+				
+				logger(u);
+
+				removePlayerBySocketId(socket.id);
+
+				io.emit('remove player', socket.id);
+			});
+
+			socket.on('manual disconnect', function() {
+				socket.disconnect();
+			});
+
+			socket.on('new player', function(player) {
+				logger('new player :');
+				logger(player);
+
+				players.push(player);
+
+				socket.emit('all players', players);
+
+				// Send new player's info to all already connect players.
+				socket.broadcast.emit('new player', player);
+			});
+
+			if (typeof callback == 'function') {
+				callback(socket);
+			}
+		});
 	});
 };
 
@@ -64,40 +96,6 @@ app.use(express.static('public'));
 
 // // Start server on heroku specified port or 3000 if on localhost
 // var port = process.env.PORT || 3000; // Heroku Only
-
-// Socket.io events
-io.on('connection', function(socket) {
-	// socket = s;	// Make s object available outside of this function
-
-	logger('websocket connection made with id: ' + socket.id);
-
-	// Player disconnect handler
-	socket.on('disconnect', function(u) {
-		logger('a user disconnected through websockets with id: ' + socket.id);
-		
-		logger(u);
-
-		removePlayerBySocketId(socket.id);
-
-		io.emit('remove player', socket.id);
-	});
-
-	socket.on('manual disconnect', function() {
-		socket.disconnect();
-	});
-
-	socket.on('new player', function(player) {
-		logger('new player :');
-		logger(player);
-
-		players.push(player);
-
-		socket.emit('all players', players);
-
-		// Send new player's info to all already connect players.
-		socket.broadcast.emit('new player', player);
-	});
-});
 
 // Routes
 
@@ -139,7 +137,7 @@ function removePlayerBySocketId(id) {
 		}
 	}
 
-	if (playerIndex != null) {
+	if (playerIndex !== null) {
 		players.splice(playerIndex, 1);
 		logger('Player removed from players array with id: ' + id);
 	}
@@ -150,3 +148,4 @@ function removePlayerBySocketId(id) {
 
 // Exports
 exports.app = app;
+exports.io = io;
